@@ -1,4 +1,5 @@
 #include <cstdint>
+#include <cstring>
 #include <fstream>
 #include "chip8.hpp"
 #include <chrono>
@@ -47,6 +48,37 @@ if (file.is_open())
 delete[]buffer;
 }
 };
+void Chip8::OP_00E0()
+{
+	memset(video,0, sizeof(video));
+}
+void Chip8::OP_00EE()
+{
+	--sp;
+	pc=stack[sp];
+}
+void Chip8::OP_1nnn()
+{
+	uint16_t address = opcode & 0x0FFFu;
+	pc= address;
+}
+void Chip8::OP_2nnn()
+{
+	uint16_t address = opcode & 0x0FFFu;
+	stack[sp]=pc;
+	++sp;
+	pc = address;
+}
+void Chip8::OP_3xkk()
+{
+	uint8_t Vx= (opcode & 0x0F00u)>>8u;
+	uint8_t byte = opcode & 0x00FFu;
+	if (registers[Vx]==byte)
+	{
+		pc+=2;
+	}
+}
+
 Chip8::Chip8(): randGen(std::chrono::system_clock::now().time_since_epoch().count())//generate random numbrs based on time or shi
 {
     randByte = std::uniform_int_distribution<uint8_t>(0, 255U);
@@ -57,3 +89,4 @@ Chip8::Chip8(): randGen(std::chrono::system_clock::now().time_since_epoch().coun
     }
     
 }	
+
