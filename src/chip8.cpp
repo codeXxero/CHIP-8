@@ -104,7 +104,7 @@ void Chip8::OP_6xkk()
 }
 void Chip8::OP_7xkk()
 {
-	uint8_t = (opcode & 0x0F00u)>> 8u;
+	uint8_t Vx = (opcode & 0x0F00u)>> 8u;
 	uint8_t byte = opcode & 0x00FFu;
       registers[Vx]+=byte;
 
@@ -149,10 +149,11 @@ void Chip8::OP_8xy4()
 		registers[0xF]= 1;
 
 	}
-  else {
-  registers[0xF]=0;
-  }
-  registers[Vx]= sum & 0xFFu;
+    else 
+	{
+     registers[0xF]=0;
+    }
+    registers[Vx]= sum & 0xFFu;
 }
 void Chip8::OP_8xy5()
 {
@@ -170,7 +171,47 @@ void Chip8::OP_8xy5()
 
 	registers[Vx] -= registers[Vy];
 }
+void Chip8::OP_8xy6()
+{
+	uint8_t Vx=(opcode & 0x0F00u)>>8u;
+	registers[0xF]=(registers[Vx]&0x1u);//lsb save in VF
+	registers[Vx]>>=1;
+}
 
+void Chip8::OP_8xy7()
+{
+	uint8_t Vx = (opcode & 0x0F00u) >> 8u;
+	uint8_t Vy = (opcode & 0x00F0u) >> 4u;
+
+	if (registers[Vy] > registers[Vx])
+	{
+		registers[0xF] = 1;
+	}
+	else
+	{
+		registers[0xF] = 0;
+	}
+
+	registers[Vx] = registers[Vy] - registers[Vx];
+}
+void Chip8::OP_8xyE()
+{
+	uint8_t Vx = (opcode & 0x0F00u) >> 8u;
+
+	// Save MSB in VF
+	registers[0xF] = (registers[Vx] & 0x80u) >> 7u;
+
+	registers[Vx] <<= 1;
+}
+void Chip8::OP_9xy0()
+{
+	uint8_t Vx = (opcode & 0x0F00u) >> 8u;
+	uint8_t Vy = (opcode & 0x00F0u) >> 4u;
+	if( registers[Vx]!= registers[Vy])
+	{
+		pc+=2;
+	}
+}
 Chip8::Chip8(): randGen(std::chrono::system_clock::now().time_since_epoch().count())//generate random numbrs based on time or shi
 {
     randByte = std::uniform_int_distribution<uint8_t>(0, 255U);
