@@ -212,6 +212,23 @@ void Chip8::OP_9xy0()
 		pc+=2;
 	}
 }
+void Chip8::OP_Annn()
+{
+	uint8_t address = opcode & 0x0FFFu;
+	index = address;
+
+}
+void Chip8::OP_Bnnn()
+{
+	uint16_t address = opcode & 0x0FFFu;
+	pc= registers[0]+address;
+}
+void Chip8::OP_Cxkk()
+{
+	uint8_t Vx= (opcode & 0x0F00u) >> 8u;
+	uint8_t byte = opcode & 0x00FFu;
+	registers[Vx]=randByte(randGen) & byte;
+}
 Chip8::Chip8(): randGen(std::chrono::system_clock::now().time_since_epoch().count())//generate random numbrs based on time or shi
 {
     randByte = std::uniform_int_distribution<uint8_t>(0, 255U);
